@@ -38,7 +38,11 @@ local success, err = pcall(function()
     end)
     task.spawn(function()
         local ok, remote = pcall(function()
-            return ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("AnalyticsPipeline"):WaitForChild("RemoteEvent")
+            local remotes = ReplicatedStorage:WaitForChild("Remotes", 10)
+            if not remotes then return nil end
+            local pipeline = remotes:WaitForChild("AnalyticsPipeline", 10)
+            if not pipeline then return nil end
+            return pipeline:WaitForChild("RemoteEvent", 10)
         end)
         if ok and remote and remote.OnClientEvent then
             local hooked = 0
@@ -53,6 +57,8 @@ local success, err = pcall(function()
                 end
             end
             print("Hooked " .. hooked .. " anticheat remotes")
+        else
+            print("AnalyticsPipeline not found, skipping remote hook")
         end
     end)
     task.spawn(function()
